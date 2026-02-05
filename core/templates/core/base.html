@@ -1,0 +1,144 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}HydroGuard{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue-1: #e8f8ff;
+      --blue-2: #ccefff;
+      --blue-3: #8fd3f4;
+      --blue-4: #4facfe;
+      --blue-5: #006b9f;
+      --text-muted: #5b7c8a;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 10%, var(--blue-2), transparent 40%),
+        radial-gradient(circle at 90% 20%, var(--blue-3), transparent 45%),
+        radial-gradient(circle at 50% 100%, var(--blue-4), transparent 55%),
+        linear-gradient(180deg, var(--blue-1), #ffffff 65%);
+      background-attachment: fixed;
+    }
+
+    /* NAVBAR */
+    .hg-navbar {
+      background: linear-gradient(
+        90deg,
+        #004e75,
+        #007bb5,
+        #00a6d6
+      );
+    }
+
+    .hg-navbar .navbar-brand {
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    /* CARD */
+    .hg-card {
+      border-radius: 20px;
+      border: none;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 20px 40px rgba(0, 107, 159, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    /* BUTTONS */
+    .btn-hg {
+      background: linear-gradient(
+        135deg,
+        #00a6d6,
+        #006b9f
+      );
+      border: none;
+      color: #fff;
+      border-radius: 12px;
+    }
+
+    .btn-hg:hover {
+      opacity: 0.92;
+      color: #fff;
+    }
+
+    .btn-hg-outline {
+      border: 2px solid #00a6d6;
+      color: #006b9f;
+      border-radius: 12px;
+      background: transparent;
+    }
+
+    .btn-hg-outline:hover {
+      background: #00a6d6;
+      color: #fff;
+    }
+
+    /* TEXT */
+    .hg-muted {
+      color: var(--text-muted);
+    }
+
+    main {
+      padding-top: 3rem;
+      padding-bottom: 4rem;
+    }
+
+    /* FOOTER */
+    footer {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,0),
+          rgba(143,211,244,0.6)
+        );
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark hg-navbar shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/dashboard/">💧 HydroGuard</a>
+
+    <div class="ms-auto d-flex gap-2">
+      {% block nav %}
+      {% endblock %}
+    </div>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<main class="container">
+  {% block content %}
+  {% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="text-center py-3">
+  <small>
+    © 2026 HydroGuard · Every drop matters
+  </small>
+</footer>
+
+</body>
+</html>

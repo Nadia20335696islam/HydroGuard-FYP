@@ -1,0 +1,74 @@
+{% extends "core/base.html" %}
+{% block title %}Log in | HydroGuard{% endblock %}
+
+{% block nav %}
+  <a class="btn btn-outline-light btn-sm" href="/accounts/register/">Register</a>
+  <a class="btn btn-light btn-sm" href="/accounts/guest/">Guest</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-5">
+    <div class="card hg-card">
+      <div class="card-body p-4 p-md-5">
+
+        <h1 class="h4 fw-bold mb-1">Welcome back</h1>
+        <p class="hg-muted mb-4">Log in to access your dashboard.</p>
+
+        {% if errors %}
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              {% for e in errors %}
+                <li>{{ e }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input
+              class="form-control"
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value="{{ email|default:'' }}"
+              required
+            >
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input
+              class="form-control"
+              type="password"
+              name="password"
+              placeholder="Your password"
+              required
+            >
+          </div>
+
+          <div class="d-flex justify-content-end mb-3">
+            <a class="text-decoration-none" href="/accounts/forgot-password/">
+              Forgot password?
+            </a>
+          </div>
+
+          <button class="btn btn-primary btn-hg w-100 hg-btn shadow-sm py-2" type="submit" style="font-size: 1.05rem;">
+            Log in
+          </button>
+        </form>
+
+        <div class="text-center mt-3">
+          <span class="hg-muted">New here?</span>
+          <a href="/accounts/register/" class="fw-semibold text-decoration-none">Create an account</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

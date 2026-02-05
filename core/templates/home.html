@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+{% block title %}Home | HydroGuard{% endblock %}
+
+{% block nav %}
+  <a class="btn btn-light btn-sm" href="/accounts/login/">Log in</a>
+  <a class="btn btn-outline-light btn-sm" href="/accounts/register/">Register</a>
+{% endblock %}
+
+{% block content %}
+<div class="card hg-card">
+  <div class="card-body p-5">
+    <h1 class="display-6 fw-bold mb-2">HydroGuard</h1>
+    <p class="hg-muted mb-4">Track water usage, build better habits, and save water every day.</p>
+    <div class="d-flex gap-2 flex-wrap">
+      <a class="btn btn-hg hg-btn" href="/accounts/register/">Get started</a>
+      <a class="btn btn-hg-outline" href="/accounts/guest/">Continue as Guest</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

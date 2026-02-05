@@ -1,0 +1,117 @@
+{% extends "core/base.html" %}
+{% block title %}Register | HydroGuard{% endblock %}
+
+{% block nav %}
+  <a class="btn btn-light btn-sm" href="/accounts/login/">Log in</a>
+  <a class="btn btn-outline-light btn-sm" href="/accounts/guest/">Guest</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-9 col-lg-6">
+    <div class="card hg-card">
+      <div class="card-body p-4 p-md-5">
+
+        <h1 class="h4 fw-bold mb-1">Create an account</h1>
+        <p class="hg-muted mb-4">Start tracking your daily water usage and build better habits.</p>
+
+        {% if errors %}
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              {% for e in errors %}
+                <li>{{ e }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">First name</label>
+              <input
+                class="form-control"
+                type="text"
+                name="first_name"
+                placeholder="e.g., Nahid"
+                value="{{ data.first_name|default:'' }}"
+                required
+              >
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Last name</label>
+              <input
+                class="form-control"
+                type="text"
+                name="last_name"
+                placeholder="e.g., Ahmed"
+                value="{{ data.last_name|default:'' }}"
+                required
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input
+              class="form-control"
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value="{{ data.email|default:'' }}"
+              required
+            >
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input
+              class="form-control"
+              type="password"
+              name="password"
+              placeholder="At least 8 characters"
+              required
+            >
+            <div class="form-text hg-muted">
+              Use a mix of upper/lowercase letters and at least one number.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Confirm Password</label>
+            <input
+              class="form-control"
+              type="password"
+              name="confirm"
+              placeholder="Re-enter your password"
+              required
+            >
+          </div>
+
+          <button class="btn btn-primary btn-hg w-100 hg-btn shadow-sm py-2" type="submit" style="font-size: 1.05rem;">
+            Register
+          </button>
+
+          <div class="mt-3">
+            <a class="btn btn-outline-primary w-100 btn-hg-outline hg-btn" href="/accounts/guest/">
+              Continue as Guest
+            </a>
+            <small class="d-block text-center hg-muted mt-2">
+              Guest mode lets you explore. Saving requires an account.
+            </small>
+          </div>
+
+          <div class="text-center mt-3">
+            <span class="hg-muted">Already have an account?</span>
+            <a href="/accounts/login/" class="fw-semibold text-decoration-none">Log in</a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
