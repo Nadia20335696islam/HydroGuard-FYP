@@ -1,0 +1,270 @@
+{% extends "core/base.html" %}
+
+{% block title %}Add Water Usage | HydroGuard{% endblock %}
+
+{% block content %}
+
+<!--
+    Add Water Usage page for HydroGuard.
+
+    This template allows authenticated users to record a new
+    water usage activity. It supports both general fields and
+    activity-specific fields that appear dynamically depending
+    on the selected activity.
+-->
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+
+    <!-- ==================================================
+         PAGE HEADER
+         ================================================== -->
+    <div class="mb-4 text-center">
+      <h1 class="fw-bold">Add Water Usage</h1>
+      <p class="hg-muted mb-0">
+        Record a new daily water usage activity to help track your consumption more accurately.
+      </p>
+    </div>
+
+    <!-- ==================================================
+         SUCCESS / ERROR MESSAGES
+         ================================================== -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- ==================================================
+         MAIN FORM CARD
+         ================================================== -->
+    <div class="card hg-card p-4 p-md-5">
+
+      <!-- Logged-in user information -->
+      <div class="mb-4">
+        <p class="mb-1 text-muted">Signed in as</p>
+        <h5 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h5>
+      </div>
+
+      <!-- Display non-field form errors -->
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Water usage submission form -->
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <!-- Activity input -->
+        <div class="mb-3">
+          <label for="{{ form.activity.id_for_label }}" class="form-label fw-semibold">
+            Activity
+          </label>
+          {{ form.activity }}
+          {% if form.activity.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.activity.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text">
+            Choose the type of activity that best matches your water usage.
+          </div>
+        </div>
+
+        <!-- Litres used input -->
+        <div class="mb-3">
+          <label for="{{ form.litres_used.id_for_label }}" class="form-label fw-semibold">
+            Litres Used
+          </label>
+          {{ form.litres_used }}
+          {% if form.litres_used.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.litres_used.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text">
+            Enter the estimated amount of water used for this activity.
+          </div>
+        </div>
+
+        <!-- Duration field: shown for shower / bath -->
+        <div class="mb-3" id="duration-field">
+          <label for="{{ form.duration_minutes.id_for_label }}" class="form-label fw-semibold">
+            Duration (Minutes)
+          </label>
+          {{ form.duration_minutes }}
+          {% if form.duration_minutes.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.duration_minutes.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text">
+            Useful for activities such as showering or bathing.
+          </div>
+        </div>
+
+        <!-- Laundry load size field -->
+        <div class="mb-3" id="laundry-field">
+          <label for="{{ form.laundry_load_size.id_for_label }}" class="form-label fw-semibold">
+            Laundry Load Size
+          </label>
+          {{ form.laundry_load_size }}
+          {% if form.laundry_load_size.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.laundry_load_size.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text">
+            Select the load size if this activity was laundry.
+          </div>
+        </div>
+
+        <!-- Dishwashing method field -->
+        <div class="mb-3" id="dishwashing-field">
+          <label for="{{ form.dishwashing_method.id_for_label }}" class="form-label fw-semibold">
+            Dishwashing Method
+          </label>
+          {{ form.dishwashing_method }}
+          {% if form.dishwashing_method.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.dishwashing_method.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text">
+            Choose whether the dishes were washed by hand or using a dishwasher.
+          </div>
+        </div>
+
+        <!-- Garden area field -->
+        <div class="mb-3" id="garden-field">
+          <label for="{{ form.garden_area.id_for_label }}" class="form-label fw-semibold">
+            Garden Area
+          </label>
+          {{ form.garden_area }}
+          {% if form.garden_area.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.garden_area.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text">
+            Describe the area you watered, such as indoor plants or a small front garden.
+          </div>
+        </div>
+
+        <!-- Usage date input -->
+        <div class="mb-3">
+          <label for="{{ form.usage_date.id_for_label }}" class="form-label fw-semibold">
+            Usage Date
+          </label>
+          {{ form.usage_date }}
+          {% if form.usage_date.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.usage_date.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Notes input -->
+        <div class="mb-4">
+          <label for="{{ form.notes.id_for_label }}" class="form-label fw-semibold">
+            Additional Notes
+          </label>
+          {{ form.notes }}
+          {% if form.notes.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.notes.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text">
+            Add any extra details that may help describe this water usage activity.
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="d-flex flex-column flex-md-row gap-2">
+          <button type="submit" class="btn btn-hg px-4">
+            Save Usage
+          </button>
+
+          <a href="/dashboard/" class="btn btn-hg-outline px-4">
+            Back to Dashboard
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================
+     CONDITIONAL FIELD DISPLAY SCRIPT
+     --------------------------------------------------
+     Shows or hides activity-specific fields depending
+     on the selected activity.
+     ================================================== -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const activityField = document.getElementById("id_activity");
+    const durationField = document.getElementById("duration-field");
+    const laundryField = document.getElementById("laundry-field");
+    const dishwashingField = document.getElementById("dishwashing-field");
+    const gardenField = document.getElementById("garden-field");
+
+    function updateConditionalFields() {
+      const selectedActivity = activityField.value;
+
+      // Hide all conditional fields by default
+      durationField.style.display = "none";
+      laundryField.style.display = "none";
+      dishwashingField.style.display = "none";
+      gardenField.style.display = "none";
+
+      // Show fields depending on selected activity
+      if (selectedActivity === "shower" || selectedActivity === "bath") {
+        durationField.style.display = "block";
+      }
+
+      if (selectedActivity === "laundry") {
+        laundryField.style.display = "block";
+      }
+
+      if (selectedActivity === "dishwashing") {
+        dishwashingField.style.display = "block";
+      }
+
+      if (selectedActivity === "garden") {
+        gardenField.style.display = "block";
+      }
+    }
+
+    // Run once when the page loads
+    updateConditionalFields();
+
+    // Run every time the activity changes
+    activityField.addEventListener("change", updateConditionalFields);
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "core/base.html" %}
+
+{% block title %}Create Community Post | HydroGuard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- ==================================================
+         CREATE COMMUNITY POST PAGE
+
+         This template provides the post creation interface
+         for the HydroGuard community feature.
+
+         Users can submit:
+         - water-saving tips
+         - local water issue reports
+
+         The design focuses on clarity, accessibility, and
+         a structured input experience that feels like a
+         proper application page rather than a plain form.
+    ================================================== -->
+
+    <!-- ==============================================
+         PAGE HEADER
+         ============================================== -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Create Community Post</h2>
+        <p class="text-muted mb-0">
+            Share a helpful water-saving tip or report a local water issue for the community.
+        </p>
+    </div>
+
+    <!-- ==============================================
+         NAVIGATION ACTIONS
+         ============================================== -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{% url 'community:community_feed' %}" class="btn btn-outline-secondary btn-sm">
+            ← Back to Community
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- ==============================================
+         POST CREATION FORM
+         ============================================== -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- Non-field validation errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Post type -->
+                <div class="mb-3">
+                    <label for="{{ form.post_type.id_for_label }}" class="form-label fw-semibold">
+                        {{ form.post_type.label }}
+                    </label>
+                    {{ form.post_type }}
+                    {% if form.post_type.help_text %}
+                        <div class="form-text">{{ form.post_type.help_text }}</div>
+                    {% endif %}
+                    {% for error in form.post_type.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Title -->
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                        {{ form.title.label }}
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.help_text %}
+                        <div class="form-text">{{ form.title.help_text }}</div>
+                    {% endif %}
+                    {% for error in form.title.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Content -->
+                <div class="mb-3">
+                    <label for="{{ form.content.id_for_label }}" class="form-label fw-semibold">
+                        {{ form.content.label }}
+                    </label>
+                    {{ form.content }}
+                    {% if form.content.help_text %}
+                        <div class="form-text">{{ form.content.help_text }}</div>
+                    {% endif %}
+                    {% for error in form.content.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Location -->
+                <div class="mb-4">
+                    <label for="{{ form.location.id_for_label }}" class="form-label fw-semibold">
+                        {{ form.location.label }}
+                    </label>
+                    {{ form.location }}
+                    {% if form.location.help_text %}
+                        <div class="form-text">{{ form.location.help_text }}</div>
+                    {% endif %}
+                    {% for error in form.location.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Form actions -->
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Publish Post
+                    </button>
+                    <a href="{% url 'community:community_feed' %}" class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

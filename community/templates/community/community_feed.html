@@ -1,0 +1,166 @@
+{% extends "core/base.html" %}
+
+{% block title %}Community | HydroGuard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- ==================================================
+         COMMUNITY FEED PAGE
+
+         This template displays the main community space
+         for HydroGuard users.
+
+         Main responsibilities:
+         - introduce the community feature
+         - provide quick access to create a new post
+         - display all community posts in a clean feed layout
+         - allow users to navigate to detailed post pages
+
+         The page is designed to support the project
+         requirement of enabling users to:
+         - share water-saving tips
+         - report local water issues
+         - interact with other users
+
+         Guest users can access this page in read-only mode.
+    ================================================== -->
+
+    <!-- ==============================================
+         PAGE HEADER
+         ============================================== -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">HydroGuard Community</h2>
+            <p class="text-muted mb-0">
+                Share water-saving tips, report local water issues, and engage with other users.
+            </p>
+        </div>
+
+        <!-- Primary action: create a new post
+             Hidden from guest users because guest access
+             is limited to viewing community content only -->
+        {% if not is_guest %}
+        <div>
+            <a href="{% url 'community:create_post' %}" class="btn btn-primary">
+                + Create Post
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ==============================================
+         GUEST ACCESS NOTICE
+         Explains that guests may view community content
+         but cannot actively participate
+         ============================================== -->
+    {% if is_guest %}
+        <div class="alert alert-warning mb-4">
+            <strong>Guest access:</strong>
+            You can view community water-saving tips and issue reports, but you must create an account to post, comment, like, or join discussions.
+        </div>
+    {% endif %}
+
+    <!-- ==============================================
+         BACK TO DASHBOARD LINK
+         ============================================== -->
+    <div class="mb-4">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <!-- ==============================================
+         COMMUNITY FEED CONTENT
+         ============================================== -->
+    {% if posts %}
+        <div class="row g-4">
+
+            {% for post in posts %}
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+
+                            <!-- Post type badge -->
+                            <div class="mb-2">
+                                {% if post.post_type == "TIP" %}
+                                    <span class="badge bg-success">Water-saving Tip</span>
+                                {% elif post.post_type == "ISSUE" %}
+                                    <span class="badge bg-danger">Water Issue Report</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Post title -->
+                            <h4 class="card-title mb-2">{{ post.title }}</h4>
+
+                            <!-- Post metadata -->
+                            <p class="text-muted small mb-2">
+                                Posted by <strong>{{ post.author.first_name }} {{ post.author.last_name }}</strong>
+                                on {{ post.created_at|date:"d M Y, H:i" }}
+                            </p>
+
+                            <!-- Optional issue location -->
+                            {% if post.location %}
+                                <p class="small mb-2">
+                                    <strong>Location:</strong> {{ post.location }}
+                                </p>
+                            {% endif %}
+
+                            <!-- Preview content -->
+                            <p class="card-text text-muted mb-3">
+                                {{ post.content|truncatewords:30 }}
+                            </p>
+
+                            <!-- Post engagement summary -->
+                            <div class="d-flex flex-wrap gap-3 mb-3">
+                                <span class="small text-muted">
+                                    👍 {{ post.likes.count }} like{{ post.likes.count|pluralize }}
+                                </span>
+                                <span class="small text-muted">
+                                    💬 {{ post.comments.count }} comment{{ post.comments.count|pluralize }}
+                                </span>
+                            </div>
+
+                            <!-- Post action
+                                 Guests can preview posts from the feed,
+                                 but only registered users may open the
+                                 full discussion page -->
+                            {% if not is_guest %}
+                                <a href="{% url 'community:post_detail' post.id %}" class="btn btn-outline-primary btn-sm">
+                                    View Full Discussion
+                                </a>
+                            {% else %}
+                                <span class="text-muted small">
+                                    Register to join the discussion and interact with posts.
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <!-- Empty state -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <h4 class="mb-2">No community posts yet</h4>
+
+                {% if is_guest %}
+                    <p class="text-muted mb-0">
+                        There are currently no community tips or issue reports to display.
+                    </p>
+                {% else %}
+                    <p class="text-muted mb-3">
+                        Be the first to share a tip or report a local water issue.
+                    </p>
+                    <a href="{% url 'community:create_post' %}" class="btn btn-primary">
+                        Create the First Post
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

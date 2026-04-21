@@ -1,25 +1,55 @@
 """
-URL configuration for hydroguard project.
+URL configuration for the HydroGuard project.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+This file serves as the main routing entry point for the entire application.
+It maps top-level URL paths to their corresponding views or app-level
+URL configurations.
+
+Each app (e.g., accounts, usage, goals) manages its own internal routes,
+which are included here using Django's `include()` function.
 """
-from django.urls import path, include
-from core import views as core_views
+
+from django.contrib import admin           # Django admin interface
+from django.urls import path, include      # URL routing utilities
+from core import views as core_views       # Core application views
+
+
+# --------------------------------------------------
+# PROJECT-LEVEL URL PATTERNS
+# --------------------------------------------------
+# These routes define the primary navigation structure
+# of the HydroGuard system.
 
 urlpatterns = [
-    path('', core_views.home, name='home'),
-     path("dashboard/", core_views.dashboard, name="dashboard"),
-    path("accounts/", include("accounts.urls")),
-]
+    # --------------------------------------------------
+    # ADMIN PANEL
+    # --------------------------------------------------
+    path("admin/", admin.site.urls),
 
+    # --------------------------------------------------
+    # CORE PAGES
+    # --------------------------------------------------
+
+    # Home page (landing page of the application)
+    path("", core_views.home, name="home"),
+
+    # Main user dashboard
+    path("dashboard/", core_views.dashboard, name="dashboard"),
+
+    # --------------------------------------------------
+    # APPLICATION ROUTES
+    # --------------------------------------------------
+
+    # Authentication system (login, register, logout, etc.)
+    path("accounts/", include("accounts.urls")),
+
+    # Water usage tracking functionality
+    path("usage/", include("usage.urls")),
+
+    # Goals and alerts functionality (NEW FEATURE)
+    path("goals/", include("goals.urls")),
+    
+    path("gamification/", include("gamification.urls")),
+    
+    path("community/", include("community.urls")),
+]

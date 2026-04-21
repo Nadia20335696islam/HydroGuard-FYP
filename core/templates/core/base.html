@@ -3,142 +3,352 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+
+  <!-- ==================================================
+       PAGE TITLE
+       Child templates can override this block
+  ================================================== -->
   <title>{% block title %}HydroGuard{% endblock %}</title>
+
+  <!-- ==================================================
+       RESPONSIVE META TAG
+       Ensures the layout adapts correctly on different
+       screen sizes such as mobile, tablet, and desktop
+  ================================================== -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap -->
+  <!-- ==================================================
+       BOOTSTRAP CSS
+       Provides responsive layout utilities and UI components
+  ================================================== -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
     rel="stylesheet"
   >
 
-  <!-- Google font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- ==================================================
+       GOOGLE FONT
+       Inter is used for a clean and modern interface
+  ================================================== -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    /* ==================================================
+       HYDROGUARD GLOBAL THEME VARIABLES
+       Centralised colour palette for consistency
+    ================================================== */
     :root {
-      --blue-1: #e8f8ff;
-      --blue-2: #ccefff;
-      --blue-3: #8fd3f4;
-      --blue-4: #4facfe;
-      --blue-5: #006b9f;
-      --text-muted: #5b7c8a;
+      --blue-1: #eefaff;
+      --blue-2: #d9f2ff;
+      --blue-3: #aee3ff;
+      --blue-4: #59c3ff;
+      --blue-5: #0d8ecf;
+      --blue-6: #006b9f;
+      --blue-7: #004e75;
+
+      --white-soft: rgba(255, 255, 255, 0.88);
+      --white-strong: rgba(255, 255, 255, 0.96);
+
+      --text-dark: #16323f;
+      --text-muted: #5f7d8a;
+      --border-soft: rgba(0, 107, 159, 0.10);
+
+      --shadow-soft: 0 10px 30px rgba(0, 107, 159, 0.10);
+      --shadow-medium: 0 18px 45px rgba(0, 107, 159, 0.14);
+
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --transition-fast: 0.2s ease;
+    }
+
+    /* ==================================================
+       GLOBAL PAGE STYLING
+       Uses a full-height layout and water-inspired
+       gradient background to match HydroGuard branding
+    ================================================== */
+    html, body {
+      height: 100%;
     }
 
     body {
       font-family: "Inter", sans-serif;
-      min-height: 100vh;
+      color: var(--text-dark);
+
       background:
-        radial-gradient(circle at 10% 10%, var(--blue-2), transparent 40%),
-        radial-gradient(circle at 90% 20%, var(--blue-3), transparent 45%),
-        radial-gradient(circle at 50% 100%, var(--blue-4), transparent 55%),
-        linear-gradient(180deg, var(--blue-1), #ffffff 65%);
+        radial-gradient(circle at 10% 10%, var(--blue-2), transparent 35%),
+        radial-gradient(circle at 90% 15%, rgba(89, 195, 255, 0.28), transparent 35%),
+        radial-gradient(circle at 50% 100%, rgba(13, 142, 207, 0.18), transparent 40%),
+        linear-gradient(180deg, #f2fbff 0%, #e9f8ff 35%, #ffffff 100%);
+
       background-attachment: fixed;
+
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
     }
 
-    /* NAVBAR */
+    /* ==================================================
+       NAVBAR STYLING
+       Keeps the header visually strong while maintaining
+       a clean and professional dashboard appearance
+    ================================================== */
     .hg-navbar {
-      background: linear-gradient(
-        90deg,
-        #004e75,
-        #007bb5,
-        #00a6d6
-      );
+      background: linear-gradient(90deg, var(--blue-7), var(--blue-6), var(--blue-5));
+      padding-top: 0.85rem;
+      padding-bottom: 0.85rem;
+      box-shadow: 0 6px 20px rgba(0, 78, 117, 0.18);
     }
 
     .hg-navbar .navbar-brand {
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.3px;
+      font-size: 1.2rem;
     }
 
-    /* CARD */
+    /* ==================================================
+       MAIN PAGE AREA
+       Flex-grow ensures footer stays at the bottom even
+       when there is limited page content
+    ================================================== */
+    .hg-page {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 2.5rem 1rem 4rem;
+    }
+
+    /* ==================================================
+       CONTENT WRAPPER
+       This controls the visible width of the application
+       so content stays centred instead of stretching
+       across the full laptop screen
+    ================================================== */
+    .hg-wrapper {
+      width: 100%;
+      max-width: 1080px;
+    }
+
+    /* ==================================================
+       OPTIONAL PAGE SURFACE
+       Creates a soft centered panel effect so pages feel
+       visually contained and easier to read
+    ================================================== */
+    .hg-content-shell {
+      background: var(--white-soft);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+
+      border: 1px solid var(--border-soft);
+      border-radius: 28px;
+      box-shadow: var(--shadow-soft);
+
+      padding: 2rem;
+    }
+
+    /* ==================================================
+       CARD STYLING
+       Reusable card design for dashboard sections and
+       feature containers throughout the application
+    ================================================== */
     .hg-card {
-      border-radius: 20px;
       border: none;
-      background: rgba(255, 255, 255, 0.92);
-      box-shadow:
-        0 20px 40px rgba(0, 107, 159, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      border-radius: var(--radius-lg);
+      background: var(--white-strong);
+      box-shadow: var(--shadow-soft);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     }
 
-    /* BUTTONS */
+    .hg-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    /* ==================================================
+       BUTTON STYLING
+       Primary HydroGuard action button
+    ================================================== */
     .btn-hg {
-      background: linear-gradient(
-        135deg,
-        #00a6d6,
-        #006b9f
-      );
+      background: linear-gradient(135deg, var(--blue-5), var(--blue-6));
       border: none;
       color: #fff;
       border-radius: 12px;
+      font-weight: 600;
+      padding: 0.7rem 1.15rem;
+      transition: transform var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
+      box-shadow: 0 8px 18px rgba(0, 107, 159, 0.18);
     }
 
-    .btn-hg:hover {
-      opacity: 0.92;
+    .btn-hg:hover,
+    .btn-hg:focus {
       color: #fff;
+      opacity: 0.96;
+      transform: translateY(-1px);
     }
 
+    /* ==================================================
+       OUTLINE BUTTON STYLING
+       Secondary button for lower-priority actions
+    ================================================== */
     .btn-hg-outline {
-      border: 2px solid #00a6d6;
-      color: #006b9f;
+      border: 2px solid var(--blue-5);
+      color: var(--blue-6);
+      background: rgba(255, 255, 255, 0.75);
       border-radius: 12px;
-      background: transparent;
+      font-weight: 600;
+      padding: 0.68rem 1.1rem;
+      transition: all var(--transition-fast);
     }
 
-    .btn-hg-outline:hover {
-      background: #00a6d6;
+    .btn-hg-outline:hover,
+    .btn-hg-outline:focus {
+      background: var(--blue-5);
+      border-color: var(--blue-5);
       color: #fff;
+      transform: translateY(-1px);
     }
 
-    /* TEXT */
+    /* ==================================================
+       TEXT UTILITY
+       Reusable muted text colour across templates
+    ================================================== */
     .hg-muted {
       color: var(--text-muted);
     }
 
-    main {
-      padding-top: 3rem;
-      padding-bottom: 4rem;
+    /* ==================================================
+       HEADINGS
+       Creates a slightly cleaner and stronger visual
+       hierarchy throughout the application
+    ================================================== */
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--text-dark);
+      font-weight: 700;
     }
 
-    /* FOOTER */
-    footer {
+    /* ==================================================
+       FORM CONTROLS
+       Helps input fields match the softer app design
+    ================================================== */
+    .form-control,
+    .form-select {
+      border-radius: 12px;
+      border: 1px solid rgba(0, 107, 159, 0.16);
+      padding: 0.75rem 0.9rem;
+      box-shadow: none;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: var(--blue-5);
+      box-shadow: 0 0 0 0.2rem rgba(13, 142, 207, 0.12);
+    }
+
+    /* ==================================================
+       FOOTER STYLING
+       Keeps the bottom of the application soft and neat
+    ================================================== */
+    .hg-footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 1rem 0 1.4rem;
+      color: var(--text-muted);
       background:
         linear-gradient(
           180deg,
           rgba(255,255,255,0),
-          rgba(143,211,244,0.6)
+          rgba(174,227,255,0.28)
         );
-      color: var(--text-muted);
+    }
+
+    .hg-footer small {
+      font-weight: 500;
+    }
+
+    /* ==================================================
+       RESPONSIVE DESIGN
+       Reduces spacing and panel padding on smaller screens
+    ================================================== */
+    @media (max-width: 991.98px) {
+      .hg-page {
+        padding: 2rem 0.9rem 3rem;
+      }
+
+      .hg-content-shell {
+        padding: 1.5rem;
+        border-radius: 22px;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .hg-navbar .navbar-brand {
+        font-size: 1.05rem;
+      }
+
+      .hg-page {
+        padding: 1.5rem 0.75rem 2.5rem;
+      }
+
+      .hg-content-shell {
+        padding: 1.1rem;
+        border-radius: 18px;
+      }
+
+      .btn-hg,
+      .btn-hg-outline {
+        width: 100%;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark hg-navbar shadow-sm">
-  <div class="container">
-    <a class="navbar-brand" href="/dashboard/">💧 HydroGuard</a>
+  <!-- ==================================================
+       NAVIGATION BAR
+       Displays HydroGuard branding and allows child
+       templates to insert custom navigation actions
+  ================================================== -->
+  <nav class="navbar navbar-expand-lg navbar-dark hg-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/dashboard/">💧 HydroGuard</a>
 
-    <div class="ms-auto d-flex gap-2">
-      {% block nav %}
-      {% endblock %}
+      <div class="ms-auto d-flex gap-2 flex-wrap">
+        {% block nav %}
+        {% endblock %}
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<!-- CONTENT -->
-<main class="container">
-  {% block content %}
-  {% endblock %}
-</main>
+  <!-- ==================================================
+       MAIN APPLICATION AREA
+       All page content is centred within a controlled
+       wrapper to improve readability and presentation
+  ================================================== -->
+  <main class="hg-page">
+    <div class="hg-wrapper">
+      <div class="hg-content-shell">
 
-<!-- FOOTER -->
-<footer class="text-center py-3">
-  <small>
-    © 2026 HydroGuard · Every drop matters
-  </small>
-</footer>
+        {% block content %}
+        {% endblock %}
 
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================================================
+       FOOTER
+       Displays simple application branding
+  ================================================== -->
+  <footer class="hg-footer">
+    <small>© 2026 HydroGuard · Every drop matters</small>
+  </footer>
+
+  <!-- ==================================================
+       BOOTSTRAP JAVASCRIPT BUNDLE
+       Needed for interactive Bootstrap components
+       such as modals, dropdowns, and collapsible menus
+  ================================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

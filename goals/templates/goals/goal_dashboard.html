@@ -1,0 +1,296 @@
+{% extends "core/base.html" %}
+
+{% block title %}Goals & Alerts | HydroGuard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- ==================================================
+         GOAL DASHBOARD PAGE
+
+         This page presents the user's goal performance in a
+         more polished, application-style layout.
+
+         Design objectives:
+         - clearer visual hierarchy
+         - stronger dashboard feel
+         - easier navigation
+         - more engaging and modern presentation
+    ================================================== -->
+
+    <!-- --------------------------------------------------
+         CUSTOM PAGE STYLING
+         Keeps all page-specific styling inside this template
+         for easier maintenance and cleaner visual control.
+    -------------------------------------------------- -->
+    <style>
+        .goal-hero {
+            background: linear-gradient(135deg, #e8f7f1 0%, #f7fcfa 100%);
+            border: 1px solid #d8efe5;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .goal-stat-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+
+        .goal-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+
+        .goal-stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 0.35rem;
+        }
+
+        .goal-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        .soft-panel {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .usage-pill {
+            display: inline-block;
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background-color: #eef6ff;
+            color: #0d6efd;
+        }
+
+        .goal-back-link {
+            text-decoration: none;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .goal-back-link:hover {
+            color: #198754;
+        }
+
+        .progress {
+            height: 18px;
+            border-radius: 999px;
+            background-color: #edf2f7;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .insight-box {
+            background-color: #f8f9fa;
+            border-radius: 18px;
+            padding: 1rem 1.25rem;
+            border: 1px solid #eceff1;
+        }
+    </style>
+
+    <!-- --------------------------------------------------
+         TOP NAVIGATION
+         Provides a clear way to return to the main dashboard.
+    -------------------------------------------------- -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <a href="{% url 'dashboard' %}" class="goal-back-link">
+            ← Back to Dashboard
+        </a>
+
+        <a href="{% url 'goal_settings' %}" class="btn btn-success px-4 py-2 rounded-pill">
+            Update Goal
+        </a>
+    </div>
+
+    <!-- --------------------------------------------------
+         HERO SECTION
+         Introduces the page with stronger branding and a
+         more polished app-like visual presentation.
+    -------------------------------------------------- -->
+    <div class="goal-hero mb-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <p class="text-success fw-semibold mb-2">Goals & Alerts</p>
+                <h2 class="fw-bold mb-2">Stay within your daily water limit</h2>
+                <p class="text-muted mb-0">
+                    Monitor your daily usage, check how close you are to your limit,
+                    and receive helpful reminders or warnings when needed.
+                </p>
+            </div>
+
+            {% if goal %}
+                <div class="usage-pill">
+                    {{ progress_percentage }}% of limit used
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if goal %}
+
+    <!-- --------------------------------------------------
+         KEY STATISTICS
+         Presents the most important figures in a more
+         modern dashboard-style card layout.
+    -------------------------------------------------- -->
+    <div class="row g-4 mb-4">
+
+        <!-- Daily target card -->
+        <div class="col-12 col-md-4">
+            <div class="card goal-stat-card">
+                <div class="card-body p-4">
+                    <div class="goal-stat-label">Daily Target</div>
+                    <h3 class="goal-stat-value text-success">{{ goal.daily_target_litres }} L</h3>
+                    <p class="text-muted mb-0">
+                        Your maximum intended water use for today.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's usage card -->
+        <div class="col-12 col-md-4">
+            <div class="card goal-stat-card">
+                <div class="card-body p-4">
+                    <div class="goal-stat-label">Today's Usage</div>
+                    <h3 class="goal-stat-value text-primary">{{ today_usage }} L</h3>
+                    <p class="text-muted mb-0">
+                        Total water recorded for today.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage level card -->
+        <div class="col-12 col-md-4">
+            <div class="card goal-stat-card">
+                <div class="card-body p-4">
+                    <div class="goal-stat-label">Usage Level</div>
+                    <h3 class="goal-stat-value">{{ progress_percentage }}% used</h3>
+                    <p class="text-muted mb-0">
+                        Lower usage means better progress towards conservation.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- --------------------------------------------------
+         VISUAL TRACKING SECTION
+         Shows user consumption against their daily limit.
+    -------------------------------------------------- -->
+    <div class="card soft-panel mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Daily Usage vs Limit</h5>
+                    <p class="text-muted mb-0">
+                        This bar shows how much of your daily water limit has already been used.
+                    </p>
+                </div>
+                <span class="badge rounded-pill text-bg-light px-3 py-2">
+                    {{ today }}
+                </span>
+            </div>
+
+            <div class="progress mb-3">
+                <div
+                    class="progress-bar {% if progress_percentage > 100 %}bg-danger{% elif progress_percentage >= 80 %}bg-warning{% else %}bg-success{% endif %}"
+                    role="progressbar"
+                    style="width: {% if progress_percentage > 100 %}100{% else %}{{ progress_percentage }}{% endif %}%;">
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>Quick insight:</strong>
+                {% if progress_percentage <= 50 %}
+                    You are currently using water carefully and staying comfortably within your limit.
+                {% elif progress_percentage <= 100 %}
+                    You are getting closer to your limit, so this is a good time to be more careful with water use.
+                {% else %}
+                    Your recorded usage is above your daily limit today, so reducing future usage would help improve performance.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- --------------------------------------------------
+         ALERT FEEDBACK SECTION
+         Displays system-generated messages based on
+         current usage behaviour and goal thresholds.
+    -------------------------------------------------- -->
+    <div class="mb-4">
+
+        {% if reminder %}
+            <div class="alert alert-info border-0 shadow-sm rounded-4">
+                <strong>Reminder:</strong> {{ reminder }}
+            </div>
+        {% endif %}
+
+        {% if warning %}
+            <div class="alert alert-warning border-0 shadow-sm rounded-4">
+                <strong>Warning:</strong> {{ warning }}
+            </div>
+        {% endif %}
+
+        {% if alert %}
+            <div class="alert alert-danger border-0 shadow-sm rounded-4">
+                <strong>Alert:</strong> {{ alert }}
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!-- --------------------------------------------------
+         ACTION SECTION
+         Gives users clear next-step actions from the page.
+    -------------------------------------------------- -->
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            Back to Dashboard
+        </a>
+        <a href="{% url 'goal_settings' %}" class="btn btn-success rounded-pill px-4">
+            Edit Goal Settings
+        </a>
+    </div>
+
+    {% else %}
+
+    <!-- --------------------------------------------------
+         EMPTY STATE
+         Encourages the user to create a goal if one does
+         not yet exist in the system.
+    -------------------------------------------------- -->
+    <div class="card soft-panel">
+        <div class="card-body p-5 text-center">
+            <h4 class="fw-bold mb-3">No goal has been set yet</h4>
+            <p class="text-muted mb-4">
+                Create a daily water-saving target to start receiving reminders,
+                warnings, and usage feedback.
+            </p>
+            <a href="{% url 'goal_settings' %}" class="btn btn-success rounded-pill px-4">
+                Create Goal
+            </a>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}

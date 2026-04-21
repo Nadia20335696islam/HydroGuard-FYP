@@ -1,0 +1,163 @@
+{% extends "core/base.html" %}
+
+{% block title %}Community Post | HydroGuard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- ==================================================
+         COMMUNITY POST DETAIL PAGE
+
+         This template displays a single community post in
+         full detail and supports user interaction.
+
+         Main responsibilities:
+         - show full post content
+         - show engagement data
+         - allow like/unlike interaction
+         - allow users to read and submit comments
+
+         This page is important because it makes the
+         community space feel interactive and realistic.
+    ================================================== -->
+
+    <!-- ==============================================
+         PAGE NAVIGATION
+         ============================================== -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{% url 'community:community_feed' %}" class="btn btn-outline-secondary btn-sm">
+            ← Back to Community
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- ==============================================
+         MAIN POST CARD
+         ============================================== -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+
+            <!-- Post type badge -->
+            <div class="mb-2">
+                {% if post.post_type == "TIP" %}
+                    <span class="badge bg-success">Water-saving Tip</span>
+                {% elif post.post_type == "ISSUE" %}
+                    <span class="badge bg-danger">Water Issue Report</span>
+                {% endif %}
+            </div>
+
+            <!-- Post title -->
+            <h2 class="fw-bold mb-2">{{ post.title }}</h2>
+
+            <!-- Post metadata -->
+            <p class="text-muted small mb-3">
+                Posted by <strong>{{ post.author.first_name }} {{ post.author.last_name }}</strong>
+                on {{ post.created_at|date:"d M Y, H:i" }}
+            </p>
+
+            <!-- Location, if available -->
+            {% if post.location %}
+                <p class="mb-3">
+                    <strong>Location:</strong> {{ post.location }}
+                </p>
+            {% endif %}
+
+            <!-- Full post content -->
+            <p class="mb-4" style="white-space: pre-line;">{{ post.content }}</p>
+
+            <!-- Engagement summary -->
+            <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
+                <span class="small text-muted">
+                    👍 {{ post.likes.count }} like{{ post.likes.count|pluralize }}
+                </span>
+                <span class="small text-muted">
+                    💬 {{ comments.count }} comment{{ comments.count|pluralize }}
+                </span>
+            </div>
+
+            <!-- Like / unlike action -->
+            <form method="post" action="{% url 'community:toggle_like' post.id %}">
+                {% csrf_token %}
+                {% if user_has_liked %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        Remove Like
+                    </button>
+                {% else %}
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        Like Post
+                    </button>
+                {% endif %}
+            </form>
+
+        </div>
+    </div>
+
+    <!-- ==============================================
+         COMMENT SUBMISSION SECTION
+         ============================================== -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+            <h4 class="mb-3">Add a Comment</h4>
+
+            <form method="post" action="{% url 'community:add_comment' post.id %}" novalidate>
+                {% csrf_token %}
+
+                {% if comment_form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ comment_form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="{{ comment_form.content.id_for_label }}" class="form-label fw-semibold">
+                        {{ comment_form.content.label }}
+                    </label>
+                    {{ comment_form.content }}
+                    {% if comment_form.content.help_text %}
+                        <div class="form-text">{{ comment_form.content.help_text }}</div>
+                    {% endif %}
+                    {% for error in comment_form.content.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Post Comment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         COMMENT LIST SECTION
+         ============================================== -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <h4 class="mb-3">Discussion</h4>
+
+            {% if comments %}
+                <div class="d-flex flex-column gap-3">
+                    {% for comment in comments %}
+                        <div class="border rounded p-3 bg-light">
+                            <p class="mb-1">
+                                <strong>{{ comment.author.first_name }} {{ comment.author.last_name }}</strong>
+                            </p>
+                            <p class="text-muted small mb-2">
+                                {{ comment.created_at|date:"d M Y, H:i" }}
+                            </p>
+                            <p class="mb-0" style="white-space: pre-line;">{{ comment.content }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">
+                    No comments yet. Start the discussion by adding the first comment.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

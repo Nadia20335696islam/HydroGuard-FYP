@@ -1,0 +1,69 @@
+{% extends "core/base.html" %}
+
+{% block title %}Home | HydroGuard{% endblock %}
+
+{% block nav %}
+<!-- ==================================================
+     NAVIGATION ACTIONS (HOME PAGE)
+     --------------------------------------------------
+     Provides quick access to authentication routes.
+
+     - "Log in" directs existing users to the login page
+     - "Register" allows new users to create an account
+
+     These buttons are displayed in the navigation bar
+     section defined in the base template.
+================================================== -->
+  <a class="btn btn-light btn-sm" href="/accounts/login/">Log in</a>
+  <a class="btn btn-outline-light btn-sm" href="/accounts/register/">Register</a>
+{% endblock %}
+
+
+{% block content %}
+<!-- ==================================================
+     HYDROGUARD LANDING CARD
+     --------------------------------------------------
+     This is the main entry section of the application.
+
+     Purpose:
+     - Introduces HydroGuard to first-time users
+     - Highlights the core value of the system
+     - Provides clear call-to-action buttons
+
+     Design Notes:
+     - Uses a card layout for visual focus
+     - Large typography for branding emphasis
+     - Buttons are grouped for easy interaction
+
+     Available Actions:
+     - "Get started" → redirects to registration
+     - "Continue as Guest" → allows limited access
+================================================== -->
+<div class="card hg-card">
+  <div class="card-body p-5">
+
+    <!-- Application title / branding -->
+    <h1 class="display-6 fw-bold mb-2">HydroGuard</h1>
+
+    <!-- Short system description -->
+    <p class="hg-muted mb-4">
+      Track water usage, build better habits, and save water every day.
+    </p>
+
+    <!-- Call-to-action buttons -->
+    <div class="d-flex gap-2 flex-wrap">
+
+      <!-- Registration entry point for new users -->
+      <a class="btn btn-hg hg-btn" href="/accounts/register/">
+        Get started
+      </a>
+
+      <!-- Guest mode access (restricted features) -->
+      <a class="btn btn-hg-outline" href="/accounts/guest/">
+        Continue as Guest
+      </a>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

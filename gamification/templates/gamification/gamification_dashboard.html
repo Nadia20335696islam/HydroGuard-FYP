@@ -1,0 +1,781 @@
+{% extends "core/base.html" %}
+{% block title %}Gamification | HydroGuard{% endblock %}
+
+{% block content %}
+<!-- ==================================================
+     HYDROGUARD GAMIFICATION HUB PAGE
+     --------------------------------------------------
+     This template presents the gamification features
+     of the HydroGuard system.
+
+     Main purposes of this page:
+     - motivate users to adopt water-saving habits
+     - reward positive behaviour through points and badges
+     - encourage repeated engagement using daily missions
+     - provide an educational mini game related to water conservation
+
+     Included sections:
+     - page header and navigation back to dashboard
+     - user progress summary cards
+     - daily mission completion area
+     - badge cabinet display
+     - interactive mini game
+     - motivational closing message
+================================================== -->
+<div class="container py-5">
+
+    <!-- ==============================================
+         PAGE HEADER SECTION
+         ----------------------------------------------
+         Displays the page title, supporting description,
+         and a quick navigation button back to the main
+         dashboard.
+    =============================================== -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Gamification Hub</h2>
+            <p class="text-muted mb-0">
+                Complete eco challenges, unlock badges, and play smart to save more water every day.
+            </p>
+        </div>
+
+        <!-- Back navigation button -->
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary rounded-pill px-4">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <!-- ==============================================
+         USER PROGRESS SUMMARY SECTION
+         ----------------------------------------------
+         These cards provide a quick overview of the
+         user's gamification status, including:
+         - total eco points
+         - current level
+         - active daily streak
+         - number of earned badges
+    =============================================== -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body">
+                    <p class="text-muted mb-2 small">Eco Points</p>
+                    <h3 class="fw-bold text-primary mb-0" id="points-value">{{ game_profile.points }}</h3>
+                    <small class="text-muted">Earned through positive water-saving actions</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body">
+                    <p class="text-muted mb-2 small">Current Level</p>
+                    <h3 class="fw-bold text-success mb-0" id="level-value">Level {{ game_profile.level }}</h3>
+                    <small class="text-muted">Your HydroGuard progress rank</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body">
+                    <p class="text-muted mb-2 small">Daily Streak</p>
+                    <h3 class="fw-bold text-warning mb-0" id="streak-value">{{ game_profile.streak_days }} days</h3>
+                    <small class="text-muted">Keep logging and saving water daily</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body">
+                    <p class="text-muted mb-2 small">Badges Earned</p>
+                    <h3 class="fw-bold text-info mb-0" id="badge-count-value">{{ earned_badges|length }}</h3>
+                    <small class="text-muted">Rewards unlocked through milestones</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         DAILY MISSIONS SECTION
+         ----------------------------------------------
+         This section presents small real-life water-
+         saving tasks that users can complete daily
+         to earn points and increase engagement.
+
+         Each mission:
+         - has a short description
+         - awards points when completed
+         - becomes disabled after completion for the day
+    =============================================== -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <h4 class="fw-bold mb-1">Today’s Water-Saving Missions</h4>
+                    <p class="text-muted mb-0">
+                        Complete these actions in real life to build your HydroGuard streak.
+                    </p>
+                </div>
+                <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill">
+                    Daily Missions
+                </span>
+            </div>
+
+            <!-- Dynamic feedback area for mission completion messages -->
+            <div id="mission-feedback" class="mb-4 d-none"></div>
+
+            <div class="row g-3">
+
+                <!-- Mission card: Short Shower -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded-4 h-100 border mission-card" id="mission-card-short_shower">
+                        <h6 class="fw-semibold">🚿 Short Shower</h6>
+                        <p class="text-muted small mb-3">
+                            Finish your shower in under 5 minutes.
+                        </p>
+
+                        {% if "short_shower" in completed_missions %}
+                            <button class="btn btn-success w-100 rounded-pill" disabled>Completed Today</button>
+                        {% else %}
+                            <button class="btn btn-outline-primary w-100 rounded-pill mission-btn" data-mission="short_shower">
+                                Claim +20 points
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Mission card: Turn Off Tap -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded-4 h-100 border mission-card" id="mission-card-turn_off_tap">
+                        <h6 class="fw-semibold">🪥 Turn Off Tap</h6>
+                        <p class="text-muted small mb-3">
+                            Keep the tap off while brushing your teeth.
+                        </p>
+
+                        {% if "turn_off_tap" in completed_missions %}
+                            <button class="btn btn-success w-100 rounded-pill" disabled>Completed Today</button>
+                        {% else %}
+                            <button class="btn btn-outline-primary w-100 rounded-pill mission-btn" data-mission="turn_off_tap">
+                                Claim +10 points
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Mission card: Smart Dishwashing -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded-4 h-100 border mission-card" id="mission-card-smart_dishwashing">
+                        <h6 class="fw-semibold">🥣 Smart Dishwashing</h6>
+                        <p class="text-muted small mb-3">
+                            Wash dishes in a filled sink instead of running water.
+                        </p>
+
+                        {% if "smart_dishwashing" in completed_missions %}
+                            <button class="btn btn-success w-100 rounded-pill" disabled>Completed Today</button>
+                        {% else %}
+                            <button class="btn btn-outline-primary w-100 rounded-pill mission-btn" data-mission="smart_dishwashing">
+                                Claim +15 points
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Mission card: Log Water Usage -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="p-3 bg-light rounded-4 h-100 border mission-card" id="mission-card-log_usage">
+                        <h6 class="fw-semibold">📊 Log Your Usage</h6>
+                        <p class="text-muted small mb-3">
+                            Add at least one water usage record today.
+                        </p>
+
+                        {% if "log_usage" in completed_missions %}
+                            <button class="btn btn-success w-100 rounded-pill" disabled>Completed Today</button>
+                        {% else %}
+                            <button class="btn btn-outline-primary w-100 rounded-pill mission-btn" data-mission="log_usage">
+                                Claim +10 points
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         BADGE CABINET SECTION
+         ----------------------------------------------
+         Displays all badges earned by the user.
+
+         Behaviour:
+         - if badges exist, show them in a card layout
+         - if no badges exist, show an empty state message
+
+         This section supports motivation by visually
+         rewarding long-term progress and achievements.
+    =============================================== -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4">
+            <h4 class="fw-bold mb-1">Badge Cabinet</h4>
+            <p class="text-muted mb-4">
+                Unlock badges as you build healthier and smarter water habits.
+            </p>
+
+            <!-- Dynamic alert area for newly unlocked badges -->
+            <div id="badge-unlock-feedback" class="mb-4 d-none"></div>
+
+            <div id="badge-cabinet-content">
+                {% if earned_badges %}
+                    <div class="row g-4">
+                        {% for item in earned_badges %}
+                            <div class="col-md-6 col-xl-4">
+                                <div class="border rounded-4 p-4 h-100 bg-light">
+                                    <div class="fs-2 mb-2">{{ item.badge.icon|default:"🏅" }}</div>
+                                    <h5 class="fw-semibold mb-1">{{ item.badge.name }}</h5>
+                                    <p class="text-muted small mb-2">
+                                        {{ item.badge.description }}
+                                    </p>
+                                    <small class="text-success fw-semibold">
+                                        Unlocked on {{ item.unlocked_at|date:"d M Y" }}
+                                    </small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- Empty badge state shown when no badges are available -->
+                    <div class="text-center py-4" id="empty-badge-state">
+                        <div class="fs-1 mb-2">🔒</div>
+                        <h5 class="fw-semibold">No badges unlocked yet</h5>
+                        <p class="text-muted mb-0">
+                            Start recording water usage and completing eco-friendly actions to earn your first badge.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         MINI GAME SECTION
+         ----------------------------------------------
+         This section contains an interactive educational
+         game called "Water Rescue Challenge".
+
+         The game:
+         - presents water-saving scenarios
+         - asks the user to choose the best option
+         - rewards points based on participation/results
+         - can only be completed once per day
+    =============================================== -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <h4 class="fw-bold mb-1">Mini Game: Water Rescue Challenge</h4>
+                    <p class="text-muted mb-0">
+                        Choose the smartest action in each scenario to protect water and earn bonus points.
+                    </p>
+                </div>
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                    Interactive Game
+                </span>
+            </div>
+
+            {% if today_game_completed %}
+                <!-- Message shown if the user already completed the game today -->
+                <div class="alert alert-info rounded-4 mb-0">
+                    🎉 You have already completed today’s Water Rescue Challenge.
+                    Come back tomorrow to play again and continue your streak.
+                </div>
+            {% else %}
+                <!-- Active mini game container -->
+                <div class="bg-light rounded-4 p-4 border">
+                    <h5 class="fw-semibold mb-3" id="scenario-title">
+                        Scenario 1: You are brushing your teeth.
+                    </h5>
+                    <p class="text-muted mb-4" id="scenario-text">
+                        What is the best way to reduce water waste during this activity?
+                    </p>
+
+                    <!-- Answer choices are inserted and updated dynamically -->
+                    <div class="d-grid gap-3" id="answer-buttons-container">
+                        <button class="btn btn-outline-primary text-start rounded-3 p-3 answer-btn" data-correct="true">
+                            Turn off the tap while brushing and only use water when needed.
+                        </button>
+
+                        <button class="btn btn-outline-primary text-start rounded-3 p-3 answer-btn" data-correct="false">
+                            Let the tap run because the water flow is small anyway.
+                        </button>
+
+                        <button class="btn btn-outline-primary text-start rounded-3 p-3 answer-btn" data-correct="false">
+                            Brush faster but keep the water running the whole time.
+                        </button>
+                    </div>
+
+                    <!-- Game result feedback area -->
+                    <div id="game-feedback" class="mt-4 d-none"></div>
+
+                    <!-- Next scenario button -->
+                    <div class="mt-4 d-flex flex-wrap gap-2">
+                        <button id="next-scenario-btn" class="btn btn-primary rounded-pill px-4 d-none">
+                            Next Scenario
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ==============================================
+         CLOSING MOTIVATIONAL MESSAGE
+         ----------------------------------------------
+         Reinforces the broader environmental purpose of
+         the gamification system and encourages continued
+         responsible behaviour.
+    =============================================== -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 text-center">
+            <h4 class="fw-bold mb-2">Every smart choice saves more than points</h4>
+            <p class="text-muted mb-0">
+                HydroGuard turns water-saving into a daily habit. The more aware your choices become,
+                the more impact you create for your home, your community, and the environment.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    /*
+    ==================================================
+    HYDROGUARD GAMIFICATION PAGE SCRIPT
+    --------------------------------------------------
+    This JavaScript handles all dynamic interactions on
+    the Gamification Hub page.
+
+    Main responsibilities:
+    - retrieve the CSRF token for secure POST requests
+    - update profile summary values in real time
+    - display newly unlocked badges
+    - render badge cabinet content dynamically
+    - handle mission completion requests
+    - control mini game flow and result submission
+
+    This improves user experience by updating the page
+    immediately without requiring a full page reload.
+    ==================================================
+    */
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /*
+        --------------------------------------------------
+        FUNCTION: getCookie
+        --------------------------------------------------
+        Retrieves a named cookie value from the browser.
+
+        Used here to obtain the Django CSRF token required
+        for secure AJAX POST requests.
+        --------------------------------------------------
+        */
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        /* CSRF token used for secure server communication */
+        const csrftoken = getCookie("csrftoken");
+
+        /* Frequently updated UI elements */
+        const pointsValue = document.getElementById("points-value");
+        const levelValue = document.getElementById("level-value");
+        const streakValue = document.getElementById("streak-value");
+        const badgeCountValue = document.getElementById("badge-count-value");
+        const missionFeedback = document.getElementById("mission-feedback");
+        const badgeUnlockFeedback = document.getElementById("badge-unlock-feedback");
+        const badgeCabinetContent = document.getElementById("badge-cabinet-content");
+
+        /*
+        --------------------------------------------------
+        FUNCTION: updateProfileUI
+        --------------------------------------------------
+        Updates the visible gamification summary values
+        after missions or games are completed.
+        --------------------------------------------------
+        */
+        function updateProfileUI(totalPoints, level, streakDays, badgeCount) {
+            pointsValue.textContent = totalPoints;
+            levelValue.textContent = `Level ${level}`;
+            streakValue.textContent = `${streakDays} days`;
+            badgeCountValue.textContent = badgeCount;
+        }
+
+        /*
+        --------------------------------------------------
+        FUNCTION: showUnlockedBadges
+        --------------------------------------------------
+        Displays a success alert when the user unlocks
+        one or more new badges.
+        --------------------------------------------------
+        */
+        function showUnlockedBadges(newlyUnlockedBadges) {
+            if (!newlyUnlockedBadges || newlyUnlockedBadges.length === 0) {
+                badgeUnlockFeedback.classList.add("d-none");
+                badgeUnlockFeedback.innerHTML = "";
+                return;
+            }
+
+            const badgeItems = newlyUnlockedBadges.map(badge => `
+                <div><strong>${badge.icon} ${badge.name}</strong> unlocked!</div>
+            `).join("");
+
+            badgeUnlockFeedback.classList.remove("d-none");
+            badgeUnlockFeedback.innerHTML = `
+                <div class="alert alert-success rounded-3 mb-0">
+                    🎉 New badge unlocked!
+                    <div class="mt-2">${badgeItems}</div>
+                </div>
+            `;
+        }
+
+        /*
+        --------------------------------------------------
+        FUNCTION: renderBadgeCabinet
+        --------------------------------------------------
+        Dynamically refreshes the badge cabinet display
+        after a mission or game result changes the user's
+        earned badge list.
+        --------------------------------------------------
+        */
+        function renderBadgeCabinet(earnedBadges) {
+            if (!earnedBadges || earnedBadges.length === 0) {
+                badgeCabinetContent.innerHTML = `
+                    <div class="text-center py-4" id="empty-badge-state">
+                        <div class="fs-1 mb-2">🔒</div>
+                        <h5 class="fw-semibold">No badges unlocked yet</h5>
+                        <p class="text-muted mb-0">
+                            Start recording water usage and completing eco-friendly actions to earn your first badge.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            const badgeCards = earnedBadges.map(badge => `
+                <div class="col-md-6 col-xl-4">
+                    <div class="border rounded-4 p-4 h-100 bg-light">
+                        <div class="fs-2 mb-2">${badge.icon || "🏅"}</div>
+                        <h5 class="fw-semibold mb-1">${badge.name}</h5>
+                        <p class="text-muted small mb-2">${badge.description}</p>
+                        <small class="text-success fw-semibold">
+                            Unlocked on ${badge.unlocked_at}
+                        </small>
+                    </div>
+                </div>
+            `).join("");
+
+            badgeCabinetContent.innerHTML = `
+                <div class="row g-4">
+                    ${badgeCards}
+                </div>
+            `;
+        }
+
+        /*
+        --------------------------------------------------
+        DAILY MISSION BUTTON HANDLING
+        --------------------------------------------------
+        Adds click listeners to all available mission
+        buttons. When a mission is completed:
+        - a POST request is sent to the server
+        - profile data is updated
+        - feedback is displayed
+        - the button is disabled to prevent duplicates
+        --------------------------------------------------
+        */
+        const missionButtons = document.querySelectorAll(".mission-btn");
+
+        missionButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const missionKey = this.dataset.mission;
+                const clickedButton = this;
+
+                fetch("{% url 'gamification:complete_daily_mission' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrftoken
+                    },
+                    body: JSON.stringify({
+                        mission_key: missionKey
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    missionFeedback.classList.remove("d-none");
+
+                    if (data.success) {
+                        updateProfileUI(data.total_points, data.level, data.streak_days, data.badge_count);
+                        renderBadgeCabinet(data.earned_badges);
+                        showUnlockedBadges(data.newly_unlocked_badges);
+
+                        missionFeedback.innerHTML = `
+                            <div class="alert alert-success rounded-3 mb-0">
+                                🎉 Mission completed! You earned <strong>${data.points_earned} points</strong>.
+                            </div>
+                        `;
+
+                        clickedButton.textContent = "Completed Today";
+                        clickedButton.classList.remove("btn-outline-primary");
+                        clickedButton.classList.add("btn-success");
+                        clickedButton.disabled = true;
+                    } else {
+                        missionFeedback.innerHTML = `
+                            <div class="alert alert-warning rounded-3 mb-0">
+                                ${data.message}
+                            </div>
+                        `;
+                    }
+                })
+                .catch(() => {
+                    missionFeedback.classList.remove("d-none");
+                    missionFeedback.innerHTML = `
+                        <div class="alert alert-danger rounded-3 mb-0">
+                            An unexpected error occurred while saving the mission.
+                        </div>
+                    `;
+                });
+            });
+        });
+
+        /* Mini game UI element references */
+        const scenarioTitle = document.getElementById("scenario-title");
+        const scenarioText = document.getElementById("scenario-text");
+        const feedbackBox = document.getElementById("game-feedback");
+        const nextButton = document.getElementById("next-scenario-btn");
+        const answerContainer = document.getElementById("answer-buttons-container");
+
+        /*
+        --------------------------------------------------
+        MINI GAME CONTROLLER
+        --------------------------------------------------
+        Runs only if all required elements exist on the page.
+
+        Responsibilities:
+        - load scenarios dynamically
+        - handle answer selection
+        - track correct answers
+        - submit result to the server at the end
+        --------------------------------------------------
+        */
+        if (scenarioTitle && scenarioText && feedbackBox && nextButton && answerContainer) {
+            const scenarios = [
+                {
+                    title: "Scenario 1: You are brushing your teeth.",
+                    text: "What is the best way to reduce water waste during this activity?",
+                    answers: [
+                        { text: "Turn off the tap while brushing and only use water when needed.", correct: true },
+                        { text: "Let the tap run because the water flow is small anyway.", correct: false },
+                        { text: "Brush faster but keep the water running the whole time.", correct: false }
+                    ]
+                },
+                {
+                    title: "Scenario 2: You are washing dishes after dinner.",
+                    text: "Which option saves the most water?",
+                    answers: [
+                        { text: "Use a filled sink or basin instead of leaving the tap running.", correct: true },
+                        { text: "Keep the tap running so soap rinses faster.", correct: false },
+                        { text: "Wash one plate at a time under strong running water.", correct: false }
+                    ]
+                },
+                {
+                    title: "Scenario 3: You notice a dripping tap at home.",
+                    text: "What should you do?",
+                    answers: [
+                        { text: "Report or fix it quickly because small leaks waste water over time.", correct: true },
+                        { text: "Ignore it because a drip does not matter much.", correct: false },
+                        { text: "Only check it if the sound becomes annoying.", correct: false }
+                    ]
+                }
+            ];
+
+            let currentScenario = 0;
+            let correctAnswersCount = 0;
+            let gameSubmissionCompleted = false;
+
+            /*
+            ----------------------------------------------
+            FUNCTION: loadScenario
+            ----------------------------------------------
+            Loads one scenario into the game interface and
+            dynamically creates the answer buttons.
+            ----------------------------------------------
+            */
+            function loadScenario(index) {
+                const scenario = scenarios[index];
+                scenarioTitle.textContent = scenario.title;
+                scenarioText.textContent = scenario.text;
+                answerContainer.innerHTML = "";
+
+                scenario.answers.forEach(answer => {
+                    const button = document.createElement("button");
+                    button.className = "btn btn-outline-primary text-start rounded-3 p-3 answer-btn";
+                    button.textContent = answer.text;
+                    button.dataset.correct = answer.correct;
+
+                    button.addEventListener("click", function () {
+                        handleAnswerSelection(button);
+                    });
+
+                    answerContainer.appendChild(button);
+                });
+
+                feedbackBox.classList.add("d-none");
+                feedbackBox.innerHTML = "";
+                nextButton.classList.add("d-none");
+            }
+
+            /*
+            ----------------------------------------------
+            FUNCTION: handleAnswerSelection
+            ----------------------------------------------
+            Handles the user's selected answer for the
+            current scenario, shows immediate feedback,
+            and enables progression to the next scenario.
+            ----------------------------------------------
+            */
+            function handleAnswerSelection(selectedButton) {
+                const allButtons = document.querySelectorAll(".answer-btn");
+                const isCorrect = selectedButton.dataset.correct === "true";
+
+                allButtons.forEach(button => {
+                    button.disabled = true;
+                });
+
+                if (isCorrect) {
+                    correctAnswersCount += 1;
+                    selectedButton.classList.remove("btn-outline-primary");
+                    selectedButton.classList.add("btn-success");
+
+                    feedbackBox.classList.remove("d-none");
+                    feedbackBox.innerHTML = `
+                        <div class="alert alert-success mb-0 rounded-3">
+                            ✅ Great choice! That action helps reduce unnecessary water waste.
+                        </div>
+                    `;
+                } else {
+                    selectedButton.classList.remove("btn-outline-primary");
+                    selectedButton.classList.add("btn-danger");
+
+                    feedbackBox.classList.remove("d-none");
+                    feedbackBox.innerHTML = `
+                        <div class="alert alert-danger mb-0 rounded-3">
+                            ❌ Not the best option. Try to think about which action uses the least water.
+                        </div>
+                    `;
+                }
+
+                nextButton.classList.remove("d-none");
+            }
+
+            /*
+            ----------------------------------------------
+            FUNCTION: submitGameResult
+            ----------------------------------------------
+            Sends the completed mini game result to the
+            backend and updates the gamification UI with
+            any new points, level changes, or badges.
+            ----------------------------------------------
+            */
+            function submitGameResult() {
+                if (gameSubmissionCompleted) {
+                    return;
+                }
+
+                fetch("{% url 'gamification:save_game_result' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrftoken
+                    },
+                    body: JSON.stringify({
+                        correct_answers: correctAnswersCount,
+                        total_questions: scenarios.length
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        gameSubmissionCompleted = true;
+
+                        updateProfileUI(data.total_points, data.level, data.streak_days, data.badge_count);
+                        renderBadgeCabinet(data.earned_badges);
+                        showUnlockedBadges(data.newly_unlocked_badges);
+
+                        feedbackBox.classList.remove("d-none");
+                        feedbackBox.innerHTML = `
+                            <div class="alert alert-info mb-0 rounded-3">
+                                🎉 Well done! You completed today's Water Rescue Challenge and earned
+                                <strong>${data.points_earned} points</strong>.
+                            </div>
+                        `;
+
+                        scenarioTitle.textContent = "Challenge Complete!";
+                        scenarioText.textContent = "Your result has been saved successfully in HydroGuard.";
+                        answerContainer.innerHTML = "";
+                        nextButton.classList.add("d-none");
+                    } else {
+                        feedbackBox.classList.remove("d-none");
+                        feedbackBox.innerHTML = `
+                            <div class="alert alert-warning mb-0 rounded-3">
+                                ${data.message}
+                            </div>
+                        `;
+                        nextButton.classList.add("d-none");
+                    }
+                })
+                .catch(() => {
+                    feedbackBox.classList.remove("d-none");
+                    feedbackBox.innerHTML = `
+                        <div class="alert alert-danger mb-0 rounded-3">
+                            An unexpected error occurred while saving your game result.
+                        </div>
+                    `;
+                });
+            }
+
+            /*
+            ----------------------------------------------
+            NEXT BUTTON EVENT
+            ----------------------------------------------
+            Loads the next scenario if available.
+            If all scenarios are complete, submits the
+            final game result to the backend.
+            ----------------------------------------------
+            */
+            nextButton.addEventListener("click", function () {
+                currentScenario += 1;
+
+                if (currentScenario < scenarios.length) {
+                    loadScenario(currentScenario);
+                } else {
+                    submitGameResult();
+                }
+            });
+
+            /* Load the first scenario when the page opens */
+            loadScenario(currentScenario);
+        }
+    });
+</script>
+{% endblock %}

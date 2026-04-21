@@ -1,158 +1,385 @@
 {% extends "core/base.html" %}
+{% block title %}Dashboard | HydroGuard{% endblock %}
+
 {% block content %}
 
-<div class="container py-4">
+<!-- ==================================================
+     HYDROGUARD MAIN DASHBOARD
 
-  <!-- Header -->
-  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+     This template serves as the primary dashboard for
+     HydroGuard users.
+
+     It supports two interface modes:
+     - Guest dashboard with limited exploration access
+     - Authenticated dashboard with full system features
+
+     The layout has been refined to work with the updated
+     centred base template and improved overall UI styling.
+
+     Included features:
+     - welcome and authentication actions
+     - toast notifications for user feedback
+     - guest preview cards and registration guidance
+     - authenticated quick access to core features
+     - dashboard status messages for reminders and alerts
+     - community access for registered users
+================================================== -->
+
+<div class="dashboard-page">
+
+  <!-- ==================================================
+       DASHBOARD HEADER
+       Displays page title, welcome message, and
+       authentication-related action buttons
+  ================================================== -->
+  <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
     <div>
       <h2 class="mb-1">Dashboard</h2>
 
       {% if is_guest %}
-        <p class="text-muted mb-0">
-          You’re browsing as a <strong>Guest</strong>. You can explore tips and general info, but tracking and personal features require an account.
+        <p class="hg-muted mb-0">
+          You’re browsing as a <strong>Guest</strong>. You can explore general features,
+          but personal tracking and progress tools require an account.
         </p>
       {% else %}
-        <p class="text-muted mb-0">
+        <p class="hg-muted mb-0">
           Welcome{% if user %}, <strong>{{ user.first_name }}</strong>{% endif %}.
         </p>
       {% endif %}
     </div>
 
-    <div class="d-flex gap-2">
+    <!-- Authentication action buttons -->
+    <div class="d-flex flex-wrap gap-2">
       {% if is_guest %}
-        <a class="btn btn-outline-primary" href="/accounts/register/">Create account</a>
-        <a class="btn btn-outline-secondary" href="/accounts/login/">Log in</a>
+        <a class="btn btn-hg" href="/accounts/register/">Create Account</a>
+        <a class="btn btn-hg-outline" href="/accounts/login/">Log In</a>
       {% else %}
-        <a class="btn btn-outline-secondary" href="/accounts/logout/">Log out</a>
+        <a class="btn btn-hg-outline" href="/accounts/logout/">Log Out</a>
       {% endif %}
     </div>
   </div>
 
-  <!-- Guest-only dashboard -->
+  <!-- ==================================================
+       WATER CONSERVATION PURPOSE BANNER
+       Helps both guest and authenticated users quickly
+       understand that HydroGuard is focused on water
+       conservation, awareness, and responsible habits
+  ================================================== -->
+  <div class="alert alert-info border-0 rounded-4 mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2">
+
+      <!-- Impact message -->
+      <div>
+        <strong>💧 Every drop matters.</strong>
+        <span class="ms-1">
+          HydroGuard encourages smarter daily habits to reduce water waste and support responsible water conservation.
+        </span>
+      </div>
+
+      <!-- Small stat line -->
+      <div class="text-lg-end">
+        <small class="text-muted">
+          🌍 Small changes in everyday routines can make a meaningful difference in saving water.
+        </small>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================================================
+       TOAST NOTIFICATIONS
+       Displays temporary feedback messages to the user
+  ================================================== -->
+  {% if messages %}
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+      {% for message in messages %}
+        <div class="toast align-items-center text-bg-success border-0 show auto-hide-toast mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button
+              type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"
+              aria-label="Close">
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   {% if is_guest %}
-    <div class="row g-3">
 
-      <div class="col-12 col-md-6">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
+    <!-- ==================================================
+         GUEST DASHBOARD VIEW
+         Provides limited but useful exploration for
+         non-registered users
+    ================================================== -->
+    <div class="row g-4">
+
+      <!-- ==============================================
+           WATER-SAVING TIPS
+           Reuses the existing community page so guest
+           users can still explore useful information
+      ============================================== -->
+      <div class="col-12 col-lg-6">
+        <div class="hg-card h-100">
+          <div class="card-body p-4">
             <h5 class="card-title mb-2">Water-saving Tips</h5>
-            <p class="text-muted mb-3">
-              Browse general recommendations to reduce waste.
+            <p class="hg-muted mb-3">
+              Browse practical tips and recommendations shared through the HydroGuard community.
             </p>
-            <button
-              type="button"
-              class="btn btn-hg w-100"
-              onclick="window.location.href='/tips/'">
-              View tips
-            </button>
+            <a class="btn btn-hg w-100" href="{% url 'community:community_feed' %}">
+              View Tips
+            </a>
           </div>
         </div>
       </div>
 
-      <div class="col-12 col-md-6">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="card-title mb-2">Local Water Quality</h5>
-            <p class="text-muted mb-3">
-              Explore water quality information by area (planned integration).
-            </p>
-            <button
-              type="button"
-              class="btn btn-outline-primary w-100"
-              onclick="window.location.href='/water-quality/'">
-              View water quality
-            </button>
+      <!-- ==============================================
+           SAMPLE VISUALISATION PREVIEW
+           Gives guest users a preview of how HydroGuard
+           presents water usage summaries and trends
+      ============================================== -->
+      <div class="col-12 col-lg-6">
+        <div class="hg-card h-100">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">Sample Water Usage Overview</h5>
+                <p class="hg-muted mb-0">
+                  Preview how HydroGuard can display water usage trends and daily insights.
+                </p>
+              </div>
+              <span class="badge bg-light text-dark border">Demo</span>
+            </div>
+
+            <!-- Sample summary metrics -->
+            <div class="row g-3 mb-4">
+              <div class="col-6">
+                <div class="border rounded-4 p-3 bg-light h-100">
+                  <small class="text-muted d-block">Weekly Usage</small>
+                  <strong class="fs-5">500L</strong>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="border rounded-4 p-3 bg-light h-100">
+                  <small class="text-muted d-block">Average Per Day</small>
+                  <strong class="fs-5">125L</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sample bar-style trend preview -->
+            <div class="mb-4">
+              <div class="d-flex align-items-center mb-2">
+                <div style="width: 95px;"><small class="text-muted">Monday</small></div>
+                <div class="progress flex-grow-1 rounded-pill" style="height: 22px;">
+                  <div class="progress-bar bg-info" style="width: 68%;">130L</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-2">
+                <div style="width: 95px;"><small class="text-muted">Tuesday</small></div>
+                <div class="progress flex-grow-1 rounded-pill" style="height: 22px;">
+                  <div class="progress-bar bg-info" style="width: 52%;">100L</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-2">
+                <div style="width: 95px;"><small class="text-muted">Wednesday</small></div>
+                <div class="progress flex-grow-1 rounded-pill" style="height: 22px;">
+                  <div class="progress-bar bg-info" style="width: 78%;">150L</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center">
+                <div style="width: 95px;"><small class="text-muted">Thursday</small></div>
+                <div class="progress flex-grow-1 rounded-pill" style="height: 22px;">
+                  <div class="progress-bar bg-info" style="width: 62%;">120L</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sample insight message -->
+            <div class="alert alert-light border mb-0 rounded-4">
+              <strong>Insight:</strong>
+              Water usage peaked on Wednesday. Register to track your own activity, compare trends,
+              and receive personalised feedback.
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- ==============================================
+           GUEST RESTRICTION NOTICE
+           Explains which features require registration
+      ============================================== -->
       <div class="col-12">
-        <div class="alert alert-warning mb-0">
+        <div class="alert alert-warning rounded-4 mb-0">
           <strong>Guest limitation:</strong>
-          Tracking, goals, badges, alerts, and community require registration.
+          Tracking, usage history, goals, alerts, gamification, and active community participation require registration.
         </div>
       </div>
 
     </div>
 
   {% else %}
-  <!-- Registered user dashboard -->
-    <div class="row g-3">
 
-      <div class="col-12 col-md-4">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
+    <!-- ==================================================
+         AUTHENTICATED USER DASHBOARD
+         Provides quick access to HydroGuard core features
+    ================================================== -->
+    <div class="row g-4">
+
+      <!-- ==============================================
+           TRACK WATER USAGE
+      ============================================== -->
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="hg-card h-100">
+          <div class="card-body p-4 d-flex flex-column">
             <h5 class="card-title mb-2">Track Water Usage</h5>
-            <p class="text-muted mb-3">
-              Record daily activities like shower, laundry, washing dishes, etc.
+            <p class="hg-muted mb-3">
+              Record your daily water usage activities and keep your data up to date.
             </p>
-            <a class="btn btn-primary w-100" href="#">
-              Add usage
+            <a class="btn btn-hg mt-auto w-100" href="/usage/add/">
+              Add Usage
             </a>
           </div>
         </div>
       </div>
 
-      <div class="col-12 col-md-4">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
+      <!-- ==============================================
+           USAGE HISTORY
+      ============================================== -->
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="hg-card h-100">
+          <div class="card-body p-4 d-flex flex-column">
             <h5 class="card-title mb-2">Usage History</h5>
-            <p class="text-muted mb-3">
-              See your past entries in a table and charts.
+            <p class="hg-muted mb-3">
+              View your previous records and monitor your water usage over time.
             </p>
-            <a class="btn btn-outline-primary w-100" href="#">
-              View history
+            <a class="btn btn-hg-outline mt-auto w-100" href="{% url 'usage_history' %}">
+              View History
             </a>
           </div>
         </div>
       </div>
 
-      <div class="col-12 col-md-4">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
+      <!-- ==============================================
+           GOALS AND ALERTS
+      ============================================== -->
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="hg-card h-100">
+          <div class="card-body p-4 d-flex flex-column">
             <h5 class="card-title mb-2">Goals & Alerts</h5>
-            <p class="text-muted mb-3">
-              Set targets and receive reminders when needed.
+            <p class="hg-muted mb-3">
+              Set daily water targets and monitor reminders, warnings, and alerts.
             </p>
-            <a class="btn btn-outline-secondary w-100" href="#">
-              Set a goal
+            <a class="btn btn-hg-outline mt-auto w-100" href="{% url 'goal_dashboard' %}">
+              Open Goals
             </a>
           </div>
         </div>
       </div>
 
-      <div class="col-12 col-lg-6">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
+      <!-- ==============================================
+           GAMIFICATION
+      ============================================== -->
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="hg-card h-100">
+          <div class="card-body p-4 d-flex flex-column">
             <h5 class="card-title mb-2">Gamification</h5>
-            <p class="text-muted mb-3">
-              Badges, challenges, and rewards (planned).
+            <p class="hg-muted mb-3">
+              Open your dedicated game area to view eco points, badges, streaks, and progress.
             </p>
-            <button class="btn btn-sm btn-outline-primary" disabled>
-              Coming soon
-            </button>
+            <a class="btn btn-hg-outline mt-auto w-100" href="{% url 'gamification:gamification_dashboard' %}">
+              Open Gamification
+            </a>
           </div>
         </div>
       </div>
 
-      <div class="col-12 col-lg-6">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="card-title mb-2">Community</h5>
-            <p class="text-muted mb-3">
-              Share tips and report local water issues (planned).
-            </p>
-            <button class="btn btn-sm btn-outline-primary" disabled>
-              Coming soon
-            </button>
+      <!-- ==================================================
+           DASHBOARD STATUS MESSAGES
+           Displays goal-based reminders, warnings, and
+           alerts directly on the dashboard
+      ================================================== -->
+      {% if reminder or warning or alert %}
+        <div class="col-12">
+          <div class="hg-card">
+            <div class="card-body p-4">
+              <h5 class="card-title mb-3">Today’s Status</h5>
+
+              {% if reminder %}
+                <div class="alert alert-info rounded-4 mb-2">
+                  <strong>Reminder:</strong> {{ reminder }}
+                </div>
+              {% endif %}
+
+              {% if warning %}
+                <div class="alert alert-warning rounded-4 mb-2">
+                  <strong>Warning:</strong> {{ warning }}
+                </div>
+              {% endif %}
+
+              {% if alert %}
+                <div class="alert alert-danger rounded-4 mb-0">
+                  <strong>Alert:</strong> {{ alert }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- ==================================================
+           COMMUNITY FEATURE CARD
+           Provides access to the community area where
+           users can share tips and report local issues
+      ================================================== -->
+      <div class="col-12">
+        <div class="hg-card">
+          <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+              <h5 class="card-title mb-2">Community</h5>
+              <p class="hg-muted mb-0">
+                Share tips, report local water issues, and interact with other HydroGuard users.
+              </p>
+            </div>
+            <div>
+              <a class="btn btn-hg" href="{% url 'community:community_feed' %}">
+                Open Community
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
     </div>
+
   {% endif %}
 
 </div>
+
+<!-- ==================================================
+     TOAST AUTO-HIDE SCRIPT
+     Automatically hides visible toast messages after a
+     short delay to reduce visual clutter
+================================================== -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toasts = document.querySelectorAll(".auto-hide-toast");
+
+    toasts.forEach(function (toast) {
+      setTimeout(function () {
+        toast.classList.remove("show");
+        toast.classList.add("hide");
+      }, 3000);
+    });
+  });
+</script>
 
 {% endblock %}

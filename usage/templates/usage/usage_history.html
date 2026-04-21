@@ -1,0 +1,372 @@
+{% extends "core/base.html" %}
+
+{% block title %}Usage History | HydroGuard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!--
+        ==================================================
+        USAGE HISTORY PAGE
+        ==================================================
+        This template displays the authenticated user's
+        recorded water usage history in an organised and
+        user-friendly dashboard format.
+
+        Main sections included:
+        1. Page header with action buttons
+        2. Summary statistic cards
+        3. Water usage trend chart
+        4. Detailed records table
+        5. Empty state message when no records exist
+
+        Purpose:
+        - allow users to review their previous entries
+        - provide visual insight into water consumption
+        - improve usability through quick navigation
+    -->
+
+    <!-- ==============================================
+         PAGE HEADER AND NAVIGATION ACTIONS
+         ----------------------------------------------
+         Displays the page title, short description, and
+         quick-access buttons for dashboard navigation
+         and new usage entry creation.
+         ============================================== -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-2">My Water Usage History</h2>
+            <p class="text-muted mb-0">
+                Monitor your personal water consumption through visual insights and detailed records.
+            </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a href="/dashboard/" class="btn btn-outline-secondary">
+                Back to Dashboard
+            </a>
+            <a href="/usage/add/" class="btn btn-primary">
+                Add New Usage
+            </a>
+        </div>
+    </div>
+
+    {% if usage_records %}
+
+        <!-- ==============================================
+             SUMMARY STATISTICS
+             ----------------------------------------------
+             Presents key usage metrics in compact cards so
+             the user can quickly understand their overall
+             consumption history.
+             ============================================== -->
+        <div class="row g-3 mb-4">
+
+            <!-- Total number of saved usage entries -->
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">Total Records</p>
+                        <h3 class="fw-bold mb-0">{{ total_records }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total litres recorded across all entries -->
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">Total Water Used</p>
+                        <h3 class="fw-bold mb-0">{{ total_litres }} L</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average water usage per record -->
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">Average Per Entry</p>
+                        <h3 class="fw-bold mb-0">{{ average_litres }} L</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Most recent activity recorded by the user -->
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">Latest Activity</p>
+                        <h6 class="fw-semibold mb-1">
+                            {% if latest_record %}
+                                {{ latest_record.get_activity_display }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </h6>
+                        <p class="text-muted mb-0 small">
+                            {% if latest_record %}
+                                {{ latest_record.usage_date }}
+                            {% else %}
+                                No recent record
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==============================================
+             WATER USAGE CHART
+             ----------------------------------------------
+             Displays a line chart showing total litres used
+             across recorded dates. This helps the user
+             identify patterns and usage trends over time.
+             ============================================== -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <h5 class="fw-bold mb-1">Water Usage Overview</h5>
+                    <p class="text-muted mb-0">
+                        Daily water usage totals based on your recorded history.
+                    </p>
+                </div>
+
+                <div style="position: relative; height: 380px;">
+                    <canvas id="usageHistoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==============================================
+             DETAILED RECORDS TABLE
+             ----------------------------------------------
+             Displays each water usage entry in a structured
+             table so users can review all recorded details
+             clearly and efficiently.
+             ============================================== -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <h5 class="fw-bold mb-1">Detailed Usage Records</h5>
+                    <p class="text-muted mb-0">
+                        Review each activity entry and its related usage details.
+                    </p>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover mb-0">
+
+                        <!-- Table headings for usage record fields -->
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Activity</th>
+                                <th>Litres Used</th>
+                                <th>Duration</th>
+                                <th>Laundry</th>
+                                <th>Dishwashing</th>
+                                <th>Garden</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+
+                        <!-- Table body rendered dynamically from usage_records -->
+                        <tbody>
+                            {% for record in usage_records %}
+                                <tr>
+                                    <td class="fw-medium">{{ record.usage_date }}</td>
+                                    <td>{{ record.get_activity_display }}</td>
+                                    <td class="fw-semibold">{{ record.litres_used }} L</td>
+
+                                    <td>
+                                        {% if record.duration_minutes %}
+                                            {{ record.duration_minutes }} min
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if record.laundry_load_size %}
+                                            {{ record.get_laundry_load_size_display }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if record.dishwashing_method %}
+                                            {{ record.get_dishwashing_method_display }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if record.garden_area %}
+                                            {{ record.garden_area }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if record.notes %}
+                                            {{ record.notes }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==============================================
+             BOTTOM PAGE ACTIONS
+             ----------------------------------------------
+             Repeats key navigation buttons at the bottom of
+             the page for better usability, especially after
+             scrolling through long record tables.
+             ============================================== -->
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <p class="text-muted mb-0">
+                Finished reviewing your history? Return to your dashboard or add another record.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/dashboard/" class="btn btn-outline-secondary">
+                    Back to Dashboard
+                </a>
+                <a href="/usage/add/" class="btn btn-primary">
+                    Add New Usage
+                </a>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- ==============================================
+             EMPTY STATE
+             ----------------------------------------------
+             Displayed when the user has not yet created any
+             water usage records. Encourages first-time data
+             entry and provides navigation back to dashboard.
+             ============================================== -->
+        <div class="card text-center p-5 shadow-sm border-0">
+            <h4 class="fw-bold mb-2">No records found</h4>
+            <p class="text-muted mb-3">
+                You have not added any water usage records yet.
+            </p>
+
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="/dashboard/" class="btn btn-outline-secondary">
+                    Back to Dashboard
+                </a>
+                <a href="/usage/add/" class="btn btn-primary">
+                    Add Your First Record
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+
+{% if usage_records %}
+    <!--
+        ==================================================
+        CHART.JS INTEGRATION
+        ==================================================
+        The Chart.js library is used to render a responsive
+        line chart for the user's recorded daily water usage.
+        The data is prepared in the Django view and passed
+        into the template as JSON-safe variables.
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        /*
+            Retrieve aggregated chart data prepared in the
+            Django view.
+
+            - usageLabels: dates for the horizontal axis
+            - usageValues: total litres used for each date
+        */
+        const usageLabels = {{ chart_labels_json|safe }};
+        const usageValues = {{ chart_values_json|safe }};
+
+        // Get the canvas context used to render the chart
+        const ctx = document.getElementById("usageHistoryChart").getContext("2d");
+
+        /*
+            Create a line chart to visualise water usage
+            trends over time.
+        */
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: usageLabels,
+                datasets: [{
+                    label: "Daily Water Usage (L)",
+                    data: usageValues,
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: "index",
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            boxWidth: 18,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + " litres";
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        },
+                        title: {
+                            display: true,
+                            text: "Litres Used"
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: "Date"
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endif %}
+{% endblock %}
