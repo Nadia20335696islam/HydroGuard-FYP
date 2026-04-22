@@ -49,5 +49,6 @@ def award_points_for_usage_entry(sender, instance, created, **kwargs):
         return
 
     game_profile, _ = UserGameProfile.objects.get_or_create(user=instance.user)
-    game_profile.eco_points += 10
+    game_profile.points += 10
+    game_profile.update_level()
     game_profile.save()
